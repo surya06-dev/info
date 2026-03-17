@@ -99,7 +99,7 @@ jobs:
             --path=./terraform \
             --compare-to=/tmp/base.json \
             --format=json \
-            --out-file=/tmp/diff.json \
+            --out-file=/tmp/infracost.json \
             --project-name="rds-upgrade"
         env:
           INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
@@ -107,7 +107,7 @@ jobs:
 
       - name: Upload to Infracost
         run: |
-          infracost upload --path=/tmp/infracost-diff.json --log-level=debug
+          infracost upload --path=/tmp/infracost.json --log-level=debug
         env:
           INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
 
