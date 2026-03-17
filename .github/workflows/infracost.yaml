@@ -99,9 +99,7 @@ jobs:
             --path=./terraform \
             --compare-to=/tmp/base.json \
             --format=json \
-            --out-file=/tmp/diff.json \
-            --repo=$GITHUB_REPOSITORY \
-            --pull-request=${{ github.event.pull_request.number }}
+            --out-file=/tmp/diff.json
         env:
           INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
 
