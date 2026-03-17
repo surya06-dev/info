@@ -58,10 +58,10 @@ jobs:
 
       - name: Upload to Infracost
         run: infracost upload --path=/tmp/infracost.json
-              env:
-                INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
-                INFRACOST_VCS_REPOSITORY_URL: https://github.com/${{ github.repository }}
-                INFRACOST_VCS_PULL_REQUEST_URL: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+          INFRACOST_VCS_REPOSITORY_URL: https://github.com/${{ github.repository }}
+          INFRACOST_VCS_PULL_REQUEST_URL: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
 
       - name: Post Infracost comment
         run: |
