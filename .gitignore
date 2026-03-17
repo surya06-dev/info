@@ -1,6 +1,8 @@
 # Local .terraform directories
 **/.terraform/*
 
+./infrocost.yaml
+
 ./terraform/.infracost/*
 
 # .tfstate files

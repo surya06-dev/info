@@ -9,6 +9,7 @@ on:
 
 jobs:
   infracost:
+    name: Run Infracost
     runs-on: ubuntu-latest
     steps:
       - name: Setup Infracost
