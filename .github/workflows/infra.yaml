@@ -3,12 +3,13 @@ name: Infracost Scan
 on:
   pull_request:
 
+  permissions:
+    contents: read
+    pull-requests: write 
 
 jobs:
   infracost:
-    permissions:
-      contents: read
-      pull-requests: write 
+    runs-on: ubuntu-latest
     steps:
       - name: Setup Infracost
         uses: infracost/actions/setup@v3
