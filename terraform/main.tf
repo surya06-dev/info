@@ -20,7 +20,7 @@ resource "aws_db_instance" "mysql_57_trigger" {
   engine_version = "8.0"
   instance_class = "db.t3.micro"
   
-  allocated_storage     = 20
+  allocated_storage     = 30
   storage_type         = "gp3"
   storage_encrypted    = true
   
