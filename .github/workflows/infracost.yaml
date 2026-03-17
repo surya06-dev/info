@@ -99,15 +99,24 @@ jobs:
             --path=./terraform \
             --compare-to=/tmp/base.json \
             --format=json \
-            --out-file=/tmp/diff.json
+            --out-file=/tmp/infracost.json \
+            --project-name="rds-upgrade"
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+
+
+      - name: Upload to Infracost
+        run: |
+          infracost upload --path=/tmp/infracost.json --log-level=debug
         env:
           INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
 
       # Post PR comment
       - name: Comment on PR
+        continue-on-error: true
         run: |
           infracost comment github \
-            --path=/tmp/diff.json \
+            --path=/tmp/infracost.json \
             --repo=${{ github.repository }} \
             --github-token=${{ secrets.GITHUB_TOKEN }} \
             --pull-request=${{ github.event.pull_request.number }} \
