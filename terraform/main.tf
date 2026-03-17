@@ -17,10 +17,10 @@ provider "aws" {
 resource "aws_db_instance" "mysql_57_trigger" {
   identifier     = "mysql-57-trigger"
   engine         = "mysql"
-  engine_version = "5.7"
+  engine_version = "8.0"
   instance_class = "db.t3.micro"
   
-  allocated_storage     = 120
+  allocated_storage     = 20
   storage_type         = "gp3"
   storage_encrypted    = true
   
