@@ -92,22 +92,22 @@ jobs:
         env:
           INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
 
-      # Generate diff (THIS sends data to Infracost Cloud)
-      - name: Generate cost diff
-        run: |
-          infracost diff \
-            --path=./terraform \
-            --compare-to=/tmp/base.json \
-            --format=json \
-            --out-file=/tmp/infracost.json \
-            --project-name="rds-upgrade"
-        env:
-          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+      # # Generate diff (THIS sends data to Infracost Cloud)
+      # - name: Generate cost diff
+      #   run: |
+      #     infracost diff \
+      #       --path=./terraform \
+      #       --compare-to=/tmp/base.json \
+      #       --format=json \
+      #       --out-file=/tmp/infracost.json \
+      #       --project-name="rds-upgrade"
+      #   env:
+      #     INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
 
 
       - name: Upload to Infracost
         run: |
-          infracost upload --path=/tmp/infracost.json --log-level=debug
+          infracost upload --path=/tmp/base.json --log-level=debug
         env:
           INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
 
