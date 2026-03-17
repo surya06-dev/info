@@ -17,35 +17,41 @@ jobs:
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      # Checkout the base branch of the pull request (e.g. main/master).
+      # Checkout base branch to a separate directory
       - name: Checkout base branch
         uses: actions/checkout@v4
         with:
           ref: '${{ github.event.pull_request.base.ref }}'
+          path: base-branch
 
-      # Generate Infracost JSON file as the baseline.
+      # Generate baseline from base branch
       - name: Generate Infracost cost estimate baseline
         run: |
+          cd base-branch
           infracost breakdown --path=. \
                               --format=json \
                               --out-file=/tmp/infracost-base.json
 
-      # Checkout the current PR branch so we can create a diff.
+      # Checkout PR branch to current directory
       - name: Checkout PR branch
         uses: actions/checkout@v4
-
-      # Generate an Infracost diff and save it to a JSON file.
+        with:
+          path: pr-branch
+        
+      # Generate diff against baseline
       - name: Generate Infracost diff
         run: |
+          cd pr-branch
           infracost diff --path=. \
                           --format=json \
                           --compare-to=/tmp/infracost-base.json \
                           --out-file=/tmp/infracost.json
 
+      # Post comment
       - name: Post Infracost comment
         run: |
-            infracost comment github --path=/tmp/infracost.json \
-                                     --repo=$GITHUB_REPOSITORY \
-                                     --github-token=${{ github.token }} \
-                                     --pull-request=${{ github.event.pull_request.number }} \
-                                     --behavior=update
+          infracost comment github --path=/tmp/infracost.json \
+                                   --repo=$GITHUB_REPOSITORY \
+                                   --github-token=${{ github.token }} \
+                                   --pull-request=${{ github.event.pull_request.number }} \
+                                   --behavior=update
