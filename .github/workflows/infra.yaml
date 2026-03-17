@@ -11,47 +11,70 @@ jobs:
   infracost:
     name: Run Infracost
     runs-on: ubuntu-latest
+
     steps:
       - name: Setup Infracost
         uses: infracost/actions/setup@v3
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      # Checkout base branch to a separate directory
       - name: Checkout base branch
         uses: actions/checkout@v4
         with:
-          ref: '${{ github.event.pull_request.base.ref }}'
+          ref: ${{ github.event.pull_request.base.ref }}
           path: base-branch
 
-      # Generate baseline from base branch
-      - name: Generate Infracost cost estimate baseline
+      - name: Generate baseline
         run: |
           cd base-branch
-          infracost breakdown --path=. \
-                              --format=json \
-                              --out-file=/tmp/infracost-base.json
+          infracost breakdown \
+            --path=. \
+            --format=json \
+            --out-file=/tmp/infracost-base.json
 
-      # Checkout PR branch to current directory
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           path: pr-branch
-        
-      # Generate diff against baseline
-      - name: Generate Infracost diff
+
+      - name: Generate diff
         run: |
           cd pr-branch
-          infracost diff --path=. \
-                          --format=json \
-                          --compare-to=/tmp/infracost-base.json \
-                          --out-file=/tmp/infracost.json
+          infracost diff \
+            --path=. \
+            --format=json \
+            --compare-to=/tmp/infracost-base.json \
+            --out-file=/tmp/infracost.json \
+            --project-name="rds-infracost"
 
-      # Post comment
+      - name: Upload to Infracost Cloud
+        run: |
+          infracost upload \
+            --path=/tmp/infracost.json \
+            --repo=${{ github.repository }} \
+            --branch=${{ github.head_ref }} \
+            --commit=${{ github.sha }} \
+            --pull-request=${{ github.event.pull_request.number }}
+
+      - name: Upload to Infracost Cloud
+        run: |
+          infracost upload --path=/tmp/infracost.json
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
+          INFRACOST_VCS_REPOSITORY_URL: https://github.com/${{ github.repository }}
+          INFRACOST_VCS_PULL_REQUEST_URL: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+          INFRACOST_VCS_PULL_REQUEST_TITLE: ${{ github.event.pull_request.title }}
+          INFRACOST_VCS_PULL_REQUEST_AUTHOR: ${{ github.actor }}
+          INFRACOST_VCS_BRANCH: ${{ github.head_ref }}
+          INFRACOST_VCS_COMMIT_SHA: ${{ github.sha }}
+
+
+
       - name: Post Infracost comment
         run: |
-          infracost comment github --path=/tmp/infracost.json \
-                                   --repo=$GITHUB_REPOSITORY \
-                                   --github-token=${{ github.token }} \
-                                   --pull-request=${{ github.event.pull_request.number }} \
-                                   --behavior=update
+          infracost comment github \
+            --path=/tmp/infracost.json \
+            --repo=${{ github.repository }} \
+            --github-token=${{ github.token }} \
+            --pull-request=${{ github.event.pull_request.number }} \
+            --behavior=update
