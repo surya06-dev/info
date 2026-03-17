@@ -49,19 +49,15 @@ jobs:
 
       - name: Upload to Infracost Cloud
         run: |
-          infracost upload \
-            --path=/tmp/infracost.json \
-            --repo=${{ github.repository }} \
-            --branch=${{ github.head_ref }} \
-            --commit=${{ github.sha }} \
-            --pull-request=${{ github.event.pull_request.number }}
-
-      - name: Upload to Infracost
-        run: infracost upload --path=/tmp/infracost.json
+          infracost upload --path=/tmp/infracost.json
         env:
           INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
           INFRACOST_VCS_REPOSITORY_URL: https://github.com/${{ github.repository }}
           INFRACOST_VCS_PULL_REQUEST_URL: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}
+          INFRACOST_VCS_PULL_REQUEST_TITLE: ${{ github.event.pull_request.title }}
+          INFRACOST_VCS_PULL_REQUEST_AUTHOR: ${{ github.actor }}
+          INFRACOST_VCS_BRANCH: ${{ github.head_ref }}
+          INFRACOST_VCS_COMMIT_SHA: ${{ github.sha }}
 
       - name: Post Infracost comment
         run: |
